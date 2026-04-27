@@ -353,13 +353,46 @@ async function sendSmsOtp(recipient, code) {
 
     const result = await response.text();
     console.log('SMS API response status:', response.status, 'body:', result);
-    
-    if (!response.ok) {
+
+    let success = false;
+    let parsed;
+    try {
+      parsed = JSON.parse(result);
+    } catch {
+      parsed = null;
+    }
+
+    if (parsed && typeof parsed === 'object') {
+      const status = parsed.status;
+      const message = String(parsed.message || parsed.msg || '');
+      if (
+        status === 10 ||
+        status === '10' ||
+        /succeed|success|succeded|ok/i.test(message)
+      ) {
+        success = true;
+      }
+    }
+
+    if (!success) {
+      const text = String(result || '').toLowerCase();
+      if (text.includes('"status":10') || /succeed|success|succeded|ok/i.test(text)) {
+        success = true;
+      }
+    }
+
+    if (!success && !response.ok) {
       throw new Error(`SMS API HTTP ${response.status}: ${result}`);
     }
-    
-    const num = parseInt(result, 10);
-    if (isNaN(num) || num <= 0) throw new Error(`SMS API error code: ${result}`);
+
+    if (!success) {
+      const num = parseInt(result, 10);
+      if (!isNaN(num) && num > 0) {
+        success = true;
+      }
+    }
+
+    if (!success) throw new Error(`SMS API error code: ${result}`);
   } catch (err) {
     console.error('SMS fetch error details:', {
       message: err.message,
@@ -374,10 +407,10 @@ app.post('/otp/send', async (req, res) => {
   if (!phone) return toJson(res, 400, { error: 'חסר מספר טלפון' });
 
   const code = generateOtp();
-  otpStore.set(phone, { code, expiresAt: Date.now() + 5 * 60 * 1000 });
 
   try {
     await sendSmsOtp(phone, code);
+    otpStore.set(phone, { code, expiresAt: Date.now() + 5 * 60 * 1000 });
     return toJson(res, 200, { success: true });
   } catch (error) {
     console.error('OTP send error:', error.message);
