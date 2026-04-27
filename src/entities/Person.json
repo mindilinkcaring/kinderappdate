@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Person",
+  "type": "object",
+  "properties": {
+    "טלפון ההורה": { "type": "string" },
+    "שם המסגרת החינוכית": { "type": "string" },
+    "שם הילד/ה": { "type": "string" },
+    "תאריך לידה": { "type": "string", "description": "DD/MM/YYYY" },
+    "מין": { "type": "string", "enum": ["זכר", "נקבה"] },
+    "קבוצת גיל": { "type": "string", "enum": ["מעורב בוגרים", "תינוקות"] },
+    "אישור הורים": { "type": "string", "enum": ["true", "false"] },
+    "תאריך עדכון": { "type": "string" },
+    "קובץ חיסונים": { "type": "string" },
+    "מסלן": { "type": "string" },
+    "מספר פנימי": { "type": "string" }
+  },
+  "required": ["טלפון ההורה", "שם המסגרת החינוכית"]
+}

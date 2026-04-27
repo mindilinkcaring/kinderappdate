@@ -1,0 +1,13 @@
+{
+  "personId": "0501234567",
+  "kindergarten": "גן תמר",
+  "parentName": "test parent",
+  "parentPhone": "0501234567",
+  "records": [
+    {
+      "childName": "test child",
+      "birthDate": "02/2020",
+      "notes": "test notes"
+    }
+  ]
+}
